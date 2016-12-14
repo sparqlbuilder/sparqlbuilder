@@ -1,0 +1,364 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.biohackathon.SPARQLBuilder.OWL;
+
+/**
+ *
+ * @author atsuko
+ */
+import java.util.*;
+
+public class OWLClassGraph extends LabeledMultiDigraph{
+    //String startClass;
+    //String endClass;
+    int nsteps = 3;
+    int limit = 100;
+    int th = 1;
+    List<String> nodeType;
+    ArrayList<HashSet<Integer>> connectionTable;
+
+    public class LinkAndPath{
+        String originalClassURI; // originalClasssURI -classLink.propertyURI-> classLink.linkedClassURL
+        ClassLink classLink;
+        List<ClassLink> path;
+        Set<String> classURIs; // apearing class URIs in the path
+        
+        
+        public LinkAndPath(ClassLink classLink, List<ClassLink> path){
+           this.classLink = classLink;
+           this.path = path;
+        }
+        
+        public LinkAndPath(ClassLink classLink, List<ClassLink> path, String originalClassURI){
+           this.classLink = classLink;
+           this.path = path;
+           this.originalClassURI = originalClassURI;
+        }
+
+        public LinkAndPath(ClassLink classLink, List<ClassLink> path, String originalClassURI, Set<String> classURIs){
+           this.classLink = classLink;
+           this.path = path;
+           this.originalClassURI = originalClassURI;
+           this.classURIs = classURIs;
+        }
+    }
+
+/*
+    public OWLClassGraph(String startClass, String endClass){
+        super();
+        
+        // start & end
+        this.startClass = startClass;
+        this.endClass = endClass;
+        
+        // parameters
+        nsteps = 3;
+        limit = 1000;
+        th = 5;
+    }
+*/
+
+/*    
+    public OWLClassGraph(String startClass, String endClass, int th){
+        super();
+        
+        // start & end
+        this.startClass = startClass;
+        this.endClass = endClass;
+        // th of instances
+        this.th = th;
+        
+        // parameters
+        nsteps = 3;
+        limit = 1000;
+    }
+*/    
+
+    public OWLClassGraph(RDFSchemaAnalyzer rdfsa){
+        super();
+        nodeType = new LinkedList<String>();
+        setClassGraph(rdfsa);
+        connectionTable = createConnectionTable();
+    }
+    
+    public int getNumberOfEdge(String url){
+        Integer node = labelednodes.get(url);
+        if (node == null){
+            return 0;
+        }
+        return adjlist.get(node).size();
+    }
+    
+    public Path[] getPaths(String startClass, String endClass){
+        List<List<ClassLink>> paths = searchPaths(startClass, endClass);
+
+        NavigableSet<Path> sortedpath = new TreeSet<Path>();
+        ListIterator<List<ClassLink>> pit = paths.listIterator();
+        int j = 0;
+        while ( pit.hasNext() ){
+            Path path = new Path();
+            path.setStartClass(startClass);
+            List<ClassLink> crrpath = pit.next();
+            path.setClassLinks(crrpath);
+            ListIterator<ClassLink> cit = crrpath.listIterator();
+            int min = Integer.MAX_VALUE;
+            while ( cit.hasNext() ){
+                ClassLink cl = cit.next();
+                if ( cl.getNumOfLinks() < min ){
+                    min = cl.getNumOfLinks();
+                }
+            }
+            path.setWidth(min);
+            sortedpath.add(path);
+            j++;
+        }
+        Path[] patharray = new Path[paths.size()];
+        Iterator<Path> pait = sortedpath.descendingIterator();
+        int i = 0;
+        while ( pait.hasNext() ){
+            patharray[i] = pait.next();
+            i++;
+        }
+        return patharray;
+    }
+    
+    public HashSet<Integer> getConnectionList(Integer node){
+        return connectionTable.get(node);
+    }
+    
+    public Path[] getPaths_old(RDFSchemaAnalyzer rdfsa, boolean countLink, String startClass, String endClass){
+        List<List<ClassLink>> paths = null;
+        paths = searchPathsbyVisitingNodes(rdfsa, countLink, startClass, endClass);
+        NavigableSet<Path> sortedpath = new TreeSet<Path>();
+        ListIterator<List<ClassLink>> pit = paths.listIterator();
+        int j = 0;
+        while ( pit.hasNext() ){
+            Path path = new Path();
+            path.setStartClass(startClass);
+            List<ClassLink> crrpath = pit.next();
+            path.setClassLinks(crrpath);
+            ListIterator<ClassLink> cit = crrpath.listIterator();
+            int min = Integer.MAX_VALUE;
+            while ( cit.hasNext() ){
+                ClassLink cl = cit.next();
+                if ( cl.getNumOfLinks() < min ){
+                    min = cl.getNumOfLinks();
+                }
+            }
+            path.setWidth(min);
+            sortedpath.add(path);
+            j++;
+        }
+        Path[] patharray = new Path[paths.size()];
+        Iterator<Path> pait = sortedpath.descendingIterator();
+        int i = 0;
+        while ( pait.hasNext() ){
+            patharray[i] = pait.next();
+            i++;
+        }
+        return patharray;
+    }
+
+    private List<List<ClassLink>> searchPaths(String startClass, String endClass){
+
+        List<List<ClassLink>> paths = new ArrayList<>();
+        List<List<Integer>> simplePaths = new LinkedList<>();
+        Integer snode = labelednodes.get(startClass);
+        Integer enode = labelednodes.get(endClass);
+        List<List<Integer>> lp = new LinkedList<>();
+        List<Integer> ini = new LinkedList<Integer>(); // initial path
+        ini.add(snode);
+        lp.add(ini);
+        for (int i = 0; i < nsteps; i++ ){
+            ListIterator<List<Integer>> lit = lp.listIterator();
+            List<List<Integer>> nextlp = new LinkedList<>();
+            while ( lit.hasNext() ){ 
+                List<Integer> crrpath = lit.next();
+                Integer crrnode = crrpath.get(crrpath.size()-1);
+                Set<Integer> nexts = gadjlist.get(crrnode).keySet();
+                Iterator<Integer> nit = nexts.iterator();
+                while( nit.hasNext() ){
+                    Integer nextnode = nit.next();
+                    if ( crrpath.contains(nextnode) ){ continue; }
+                    List<Integer> nextpath = new LinkedList<Integer>(crrpath); // copy
+                    nextpath.add(nextnode);
+                    if ( nextnode.equals(enode) ){
+                        simplePaths.add(nextpath);
+                    }
+                    nextlp.add(nextpath);
+                }
+	    }
+            lp = nextlp;
+        }
+        
+        return paths;
+    }
+    
+    /*
+    private List<List<ClassLink>> searchPaths(RDFSchemaAnalyzer rdfsa, boolean countLinks){
+        List<List<ClassLink>> paths = new ArrayList<>();
+        List<LinkAndPath> lp = new LinkedList<>();
+        lp.add(new LinkAndPath(new ClassLink("",startClass,null,Direction.both,0,0,0,0,0,false,false), new LinkedList<ClassLink>(), ""));
+        try{
+          for ( int i = 0; i < nsteps; i++ ){
+              ListIterator<LinkAndPath> lit = lp.listIterator();
+              List<LinkAndPath> nextlp = new LinkedList<>();
+              while ( lit.hasNext() ){
+                  LinkAndPath crrlp = lit.next();
+                  ClassLink[] classLinks = rdfsa.getNextClass(null, crrlp.classLink.getLinkedClassURI(), limit, countLinks);
+                  for ( int j = 0 ; j < classLinks.length; j++ ){
+                      List<ClassLink> crrpath = new LinkedList<>(crrlp.path);
+                      crrpath.add(classLinks[j]);
+                      if ( classLinks[j].getLinkedClassURI() == null ){ continue; }
+                      if ( classLinks[j].getLinkedClassURI().equals(endClass) ){
+                          paths.add(new LinkedList<>(crrpath));
+                          continue;
+                      }
+                      if ( countLinks == true && classLinks[j].getNumOfLinks() <= th){
+                          continue;
+                      }
+                      if ( i >= 2 ){
+                          if ( crrlp.classLink.getPropertyURI().equals(classLinks[j].getPropertyURI()) &&
+                           crrlp.classLink.getDirection() != classLinks[j].getDirection() &&
+                           crrlp.originalClassURI.equals( classLinks[j].getLinkedClassURI()) ){
+                              continue;
+                          }
+                      }
+                      nextlp.add(new LinkAndPath(classLinks[j], crrpath, crrlp.classLink.getLinkedClassURI()));
+                  }
+              }
+              lp = nextlp;
+          }
+        }catch(Exception e){ 
+            System.err.println(e);
+        }
+        return paths;  
+    }
+    */
+    
+    private List<List<ClassLink>> searchPathsbyVisitingNodes(RDFSchemaAnalyzer rdfsa, boolean countLinks,
+            String startClass, String endClass){
+        List<List<ClassLink>> paths = new ArrayList<>();
+        List<LinkAndPath> lp = new LinkedList<>();
+        Set<String> urls = new HashSet<String>();
+        urls.add(startClass);
+        lp.add(new LinkAndPath(new ClassLink("",startClass,null,Direction.both,0,0,0,0,0,false,false), 
+                                 new LinkedList<ClassLink>(), startClass, urls));
+        try{
+          for ( int i = 0; i < nsteps; i++ ){
+              ListIterator<LinkAndPath> lit = lp.listIterator();
+              List<LinkAndPath> nextlp = new LinkedList<>();
+              while ( lit.hasNext() ){
+                  LinkAndPath crrlp = lit.next();
+                  ClassLink[] classLinks = rdfsa.getNextClass(null, crrlp.classLink.getLinkedClassURI(), limit, countLinks);
+                  // limit
+                  for ( int j = 0 ; j < classLinks.length; j++ ){
+                      if (crrlp.classURIs.contains(classLinks[j].getLinkedClassURI()) ){
+                          continue; // visited
+                      }
+                      List<ClassLink> crrpath = new LinkedList<>(crrlp.path);
+                      crrpath.add(classLinks[j]);
+                      Set<String> crrurls = new HashSet<String>(crrlp.classURIs);
+                      crrurls.add(classLinks[j].getLinkedClassURI());
+                      if ( classLinks[j].getLinkedClassURI() == null ){ continue; }
+                      if ( classLinks[j].getNumOfLinks() <= th){
+                          continue;
+                      }
+                      if ( classLinks[j].getLinkedClassURI().equals(endClass) ){
+                          paths.add(new LinkedList<>(crrpath));
+                          continue;
+                      }
+                      //crrlp.classURIs.add()
+                      nextlp.add(new LinkAndPath(classLinks[j], crrpath, crrlp.classLink.getLinkedClassURI(),crrurls));
+                  }
+              }
+              lp = nextlp;
+          }
+        }catch(Exception e){ 
+            System.err.println(e);
+        }
+        return paths;  
+    }
+              
+   private void setClassGraph(RDFSchemaAnalyzer rdfsa){
+       // setNodes
+       SClass[] classes = null;
+       try{
+           classes = rdfsa.getOWLClasses(null, null, null, true);
+       }catch(Exception e){
+           System.err.println(e); return;
+       }
+       for (int i = 0 ; i < classes.length; i++){
+           addNode(classes[i].getClassURI());
+           nodeType.add("class");
+       }
+       // setEdges
+       for (int i = 0 ; i < classes.length; i++ ){
+           try{
+               ClassLink[] classLinks = rdfsa.getNextClass(null, classes[i].getClassURI(), limit, true);
+               for (int j = 0 ; j < classLinks.length; j++){
+                   Integer n = labelednodes.get(classLinks[j].getLinkedClassURI());
+                   if ( n != null ){
+                       addEdge(i, n, classLinks[j]);
+                   }else{
+                       n = labelednodes.get(classLinks[j].getLinkedLiteralDatatypeURI());
+                       if ( n == null ){
+                           addNode(classLinks[j].getLinkedLiteralDatatypeURI());
+                           n = nodeType.size();
+                           nodeType.add("literal");
+                       }
+                       addEdge(i, n, classLinks[j]);
+                       
+                       ClassLink rev = new ClassLink( classLinks[j].getPropertyURI(),
+                               classLinks[j].getLinkedClassURI(), classLinks[j].getLinkedLiteralDatatypeURI(),
+                               classLinks[j].getDirection(), classLinks[j].getNumOfLinks(), 
+                               classLinks[j].getNumOfOriginInstances(), classLinks[j].getNumOfLinkedInstances(),
+                               classLinks[j].getNumOfOriginClassInstances(), classLinks[j].getNumOfLinkedClassInstances(),
+                               classLinks[j].isDomainClassLimitedQ(), classLinks[j].isRangeClassLimitedQ() );
+                       rev.setDirection(Direction.reverse);
+                       addEdge(n, i, rev);
+                   }
+               }
+           }catch(Exception e){
+               System.err.println(e);
+           }
+       }       
+   }
+   
+   private ArrayList<HashSet<Integer>> createConnectionTable(){
+       ArrayList<HashSet<Integer>> ct = new ArrayList<HashSet<Integer>>();
+       for (int i = 0; i < labels.size(); i++ ){ // each node
+           HashSet<Integer> cl = createConnectionList(i);
+           ct.add(cl);
+       }
+       return ct;
+   }
+   
+   private HashSet<Integer> createConnectionList(Integer node){
+       HashSet<Integer> cl = new HashSet<Integer>();
+       HashSet<Integer> crrnodes = new HashSet<Integer>();
+       crrnodes.add(node);
+       cl.add(node);
+       for ( int i = 0 ; i < nsteps; i++ ){
+           Set<Integer> nextnodes = new HashSet<Integer>();
+           Iterator<Integer> cit = crrnodes.iterator();
+           while ( cit.hasNext() ){
+               Integer crr = cit.next();
+               Set<Integer> nexts = gadjlist.get(crr).keySet();
+               Iterator<Integer> nit = nexts.iterator();
+               while ( nit.hasNext() ){
+                   Integer next = nit.next();
+                   if ( !cl.contains(next) ){
+                       nextnodes.add(next);
+                       cl.add(next);
+                   }
+               }
+           }
+           crrnodes.clear();
+           crrnodes.addAll(nextnodes);
+       }
+       return cl;
+   }
+}
