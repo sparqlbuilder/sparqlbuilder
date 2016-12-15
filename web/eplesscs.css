@@ -1,0 +1,134 @@
+@charset "UTF-8";
+
+div.wrap {
+	position: absolute;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	background-color: rgba(0,0,0,0.8);
+}
+
+div.classselect {
+	position: absolute;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	margin: auto;
+	width: 90%;
+	height: 90%;
+	overflow: hidden;
+	background: #fafafa;
+}
+
+div.left {
+	float: left;
+	width: 50%;
+	height: 100%;
+	padding: 5px 0px;
+}
+
+div.right {
+	float: right;
+	width: 50%;
+	height: 100%;
+	padding: 5px 0px;
+}
+
+div.startclass, div.endclass {
+	padding: 5px 0px;
+}
+
+#searchstarttext, #searchendtext {
+	width: 100%;
+}
+
+span.startclassuri:hover {
+	cursor: pointer;
+
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	padding: 3px;
+
+	background-color: hsl(40, 50%, 75%);
+}
+
+span.endclassuri:hover {
+	cursor: pointer;
+
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	padding: 3px;
+
+	background-color: hsl(150, 50%, 75%);
+}
+
+span.endpointuri {
+    display: block;
+    margin: 3px;
+    padding-left: 30px;
+}
+
+span.endpointuri:hover {
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	background-color: hsl(200, 50%, 75%);
+}
+
+span.selectedstart {
+	cursor: pointer;
+
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	padding: 2px;
+	border: 2px hsl(40, 50%, 50%) solid;
+
+	background-color: hsl(40, 50%, 75%);
+}
+
+span.selectedend {
+	cursor: pointer;
+
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	padding: 2px;
+
+	border: 2px hsl(150, 50%, 50%) solid;
+
+	background-color: hsl(150, 50%, 75%);
+}
+
+span.selectedendpoint {
+	text-align: center;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	padding: 1px;
+
+	border: 2px hsl(200, 50%, 50%) solid;
+	background-color: hsl(200, 50%, 75%);
+}
+
+table {
+	width: 100%;
+}
+
+tr.nohit {
+	display: none;
+}
+
+tr.endpointrow th {
+	text-align: center;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	padding: 3px;
+
+	background-color: hsl(200, 50%, 75%);
+}

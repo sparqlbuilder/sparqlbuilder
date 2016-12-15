@@ -1,0 +1,94 @@
+@charset "UTF-8";
+
+
+body {
+	font-family: 'Lucida Grande', sans-serif;
+	font-size: 14px;
+	line-height: 1.6;
+	margin: 0;
+	padding: 10px;
+	height: 100%;
+}
+
+.SparqlBuilder {
+  background-color: rgba(128, 128, 128, 0.7);
+  position: absolute;
+  display: none;
+  top: 0;
+  left: 0;
+	height: 100%;
+}
+
+.SparqlBuilderContent {
+  background-color: rgba(255, 255, 255, 1);
+  margin: 50px;
+  padding: 50px;
+  border: 1px solid;
+}
+
+#sparqlBuilderShowpath {
+	position: absolute;
+	width: 200px;
+	height: auto;
+	padding: 15px;
+	-webkit-border-radius: 20px;
+	border-radius: 20px;
+	-webkit-box-shadow: 0px 0px 10px #000000;
+	box-shadow: 0px 0px 10px #000000;
+	background-image: -moz-linear-gradient(top, #eeeeff, #ffffff);
+	background-image: -ms-linear-gradient(top, #eeeeff, #ffffff);
+	background-image: -o-linear-gradient(top, #eeeeff, #ffffff);
+	background-image: -webkit-gradient(linear, center top, center bottom, from(#eeeeff), to(#ffffff));
+	background-image: -webkit-linear-gradient(top, #eeeeff, #ffffff);
+	background-image: linear-gradient(top, #eeeeff, #ffffff);
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	display: none;
+	text-align: center;
+}
+#sparqlBuilderSelectpath {
+	font-size: 12px;
+}
+#sparqlBuilderSelectpath span {
+	margin-top: -1.2em;
+	display: block;
+	margin-bottom: -3.0em;
+	font-size: 14px;
+}
+#sparqlBuilderSelectpath h3 + span {
+	margin-top: 0;
+}
+#sparqlBuilderSelectpath span:before {
+	content: "┃";
+	font-size: 70%;
+}
+#sparqlBuilderSelectpath span:after {
+	content: "┃";
+}
+#sparqlBuilderSelectpath span:before,
+#sparqlBuilderSelectpath span:after {
+	display: block;
+}
+#sparqlBuilderSelectpath h3 + span:before {
+	content: normal;
+}
+#GenerateSPARQLButton {
+	font-size: 14px;
+	margin-top: 6px;
+}
+
+/* svg */
+.tnode {
+	font-size: 12px;
+	font-weight: bold;
+}
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+.tlink {
+	font-size: 12px;
+}
+.tnode, .tlink {
+	text-shadow: 0  0  1px #fff;
+}
