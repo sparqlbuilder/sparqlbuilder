@@ -1,94 +1,220 @@
-@charset "UTF-8";
-
-
-body {
-	font-family: 'Lucida Grande', sans-serif;
-	font-size: 14px;
-	line-height: 1.6;
-	margin: 0;
-	padding: 10px;
-	height: 100%;
+#SPARQLBUILDER{
+	width: 90%;
+	margin: auto;
+	color: initial;
+	font-size: initial;
+	font-family: initial;
+}
+.SBSparqlArea{
+	width: 100%;
 }
 
-.SparqlBuilder {
-  background-color: rgba(128, 128, 128, 0.7);
-  position: absolute;
-  display: none;
-  top: 0;
-  left: 0;
-	height: 100%;
+.SBTopButton{
+	margin: 0.5em 1em 0.5em 0;
+	-webkit-border-radius: 7;
+	-moz-border-radius: 7;
+	border-radius: 7px;
+	border: none;
+	color: #ffffff;
+	background: hsl(200, 50%, 75%);
+	padding: 5px 15px 5px 15px;
+	cursor: pointer;
 }
 
-.SparqlBuilderContent {
-  background-color: rgba(255, 255, 255, 1);
-  margin: 50px;
-  padding: 50px;
-  border: 1px solid;
+.SBTopButton:hover{
+	background: hsl(200, 50%, 85%);
 }
 
-#sparqlBuilderShowpath {
+.SBTutorialLink{
+	margin-top: 1.5em;
+}
+
+.SBModalView{
 	position: absolute;
-	width: 200px;
-	height: auto;
-	padding: 15px;
-	-webkit-border-radius: 20px;
-	border-radius: 20px;
-	-webkit-box-shadow: 0px 0px 10px #000000;
-	box-shadow: 0px 0px 10px #000000;
-	background-image: -moz-linear-gradient(top, #eeeeff, #ffffff);
-	background-image: -ms-linear-gradient(top, #eeeeff, #ffffff);
-	background-image: -o-linear-gradient(top, #eeeeff, #ffffff);
-	background-image: -webkit-gradient(linear, center top, center bottom, from(#eeeeff), to(#ffffff));
-	background-image: -webkit-linear-gradient(top, #eeeeff, #ffffff);
-	background-image: linear-gradient(top, #eeeeff, #ffffff);
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	background-color: rgba(0,0,0,0.8);
 	display: none;
+	color: initial;
+	font-size: initial;
+	font-family: initial;
+}
+
+.SBModalContents{
+	position: absolute;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	margin: auto;
+	width: 90%;
+	height: 90%;
+	background: white;
+	overflow: hidden;
+}
+
+.SBModalContents .SBForms{
+	float: left;
+	background-color: #eeeeff;
+}
+
+.SBModalContents .SBSelects{
+	float: left;
+}
+
+.SBModalContents .SBSelects .SBEndPointSelect{
+	width: 100%;
+	height: 2em;
+}
+
+.SBModalContents .SBSelects .SBStartClassSelect{
+	width: 50%;
+	height: 2em;
+}
+
+.SBModalContents .SBSelects .SBEndClassSelect{
+	width: 50%;
+	height: 2em;
+}
+
+
+.SBModalContents .SBPermaLink{
+	height: 100%;
+	float: right;
 	text-align: center;
 }
-#sparqlBuilderSelectpath {
-	font-size: 12px;
-}
-#sparqlBuilderSelectpath span {
-	margin-top: -1.2em;
-	display: block;
-	margin-bottom: -3.0em;
-	font-size: 14px;
-}
-#sparqlBuilderSelectpath h3 + span {
-	margin-top: 0;
-}
-#sparqlBuilderSelectpath span:before {
-	content: "┃";
-	font-size: 70%;
-}
-#sparqlBuilderSelectpath span:after {
-	content: "┃";
-}
-#sparqlBuilderSelectpath span:before,
-#sparqlBuilderSelectpath span:after {
-	display: block;
-}
-#sparqlBuilderSelectpath h3 + span:before {
-	content: normal;
-}
-#GenerateSPARQLButton {
-	font-size: 14px;
-	margin-top: 6px;
+
+.SBModalContents .SBPermaLinkButton{
+	display: inline-block;
+	margin-top: 10px;
+	width: 90%;
+	height: 36px;
+	-webkit-border-radius: 3;
+	-moz-border-radius: 3;
+	border-radius: 3px;
+	border: none;
+	color: #ffffff;
+	background: hsl(0, 50%, 75%);
+	padding: 3px 5px 3px 5px;
+	cursor: pointer;
 }
 
-/* svg */
-.tnode {
-	font-size: 12px;
-	font-weight: bold;
+.SBModalContents .SBPermaLinkButton:hover{
+	background: hsl(0, 50%, 85%);
 }
-.link {
-  stroke: #999;
-  stroke-opacity: .6;
+
+.SBModalContents .SBMessage{
+	float: left;
+	text-align: center;
+	background-color: #eeeeff;
 }
-.tlink {
-	font-size: 12px;
+
+.SBModalContents .SBResult{
+	display: none;
+	height: 24px;
+	font-size: 18px;
 }
-.tnode, .tlink {
-	text-shadow: 0  0  1px #fff;
+
+.SBModalContents .SBViewAll{
+	display: none;
+	height: 28px;
+	-webkit-border-radius: 3;
+	-moz-border-radius: 3;
+	border-radius: 3px;
+	border: none;
+	color: #ffffff;
+	background: hsl(0, 50%, 75%);
+	padding: 3px 5px 3px 5px;
+	cursor: pointer;
+}
+
+.SBModalContents .SBViewAll:hover{
+	background: hsl(0, 50%, 85%);
+}
+
+.SBModalContents .SBGraph{
+	float: left;
+}
+
+.SBModalContents .SBAjaxLoad{
+	position: relative;
+	top: 0;
+	left:0;
+	height: 100%;
+	background: #fffafa;
+}
+
+.SBModalContents .SBLoadIcon{
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+	width: 100px;
+	height: 100px;
+}
+
+.SBModalContents .SBPath{
+	float: left;
+	padding: 10px;
+	text-align: center;
+	word-wrap: break-word;
+}
+
+.SBRootNode{
+	margin: 0.5em;
+	margin-top: 1em;
+	-webkit-border-radius: 10;
+	-moz-border-radius: 10;
+	border-radius: 10px;
+	background: hsl(40, 50%, 75%);
+	padding: 5px 15px 5px 15px;
+}
+
+.SBPathProperty{
+	margin: 0.2em;
+}
+
+.SBPathNode{
+	margin: 0.5em;
+	-webkit-border-radius: 10;
+	-moz-border-radius: 10;
+	border-radius: 10px;
+	background: hsl(0, 0%, 85%);
+	padding: 5px 15px 5px 15px;
+}
+
+.SBLeafNode{
+	margin: 0.5em;
+	-webkit-border-radius: 10;
+	-moz-border-radius: 10;
+	border-radius: 10px;
+	background: hsl(150, 50%, 75%);
+	padding: 5px 15px 5px 15px;
+}
+
+.SBModalContents .SBModalButtons{
+	float: left;
+	text-align: center;
+}
+
+.SBModalButton{
+	display: inline-block;
+	width: 80%;
+	height: 26px;
+	-webkit-border-radius: 3;
+	-moz-border-radius: 3;
+	border-radius: 3px;
+	border: none;
+	color: #ffffff;
+	background: hsl(0, 50%, 75%);
+	padding: 3px 5px 3px 5px;
+	cursor: pointer;
+}
+
+.SBModalButton:hover{
+	background: hsl(0, 50%, 85%);
 }
