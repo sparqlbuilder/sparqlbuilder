@@ -406,7 +406,7 @@ function loadPathList() {
 	$('.SBSelectedPath').html('<h1>Please <span style="color: hsl(150, 50%, 75%);">select a leaf node</span> and click to generate a SPARQL</h1><img src=\"images/pathline.png\" style="display:none;">');
 
 	// 情報取得用APIのURLを作成（プレフィックス＋plist＋各種選択結果）
-	var url = prefix + "/plist?ep=" + encodeURIComponent(endpoint)
+	var url = prefix + "/api/plist?ep=" + encodeURIComponent(endpoint)
 									+ "&startclass=" + encodeURIComponent(startclass)
 									+ "&endclass="   + encodeURIComponent(endclass);
 
