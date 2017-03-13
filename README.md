@@ -1,2 +1,2 @@
 # sparqlbuilder
-The repository includes source for http://www.sparqlbuider.org/
+The repository includes source for http://www.sparqlbuilder.org/
