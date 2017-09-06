@@ -24,8 +24,8 @@ public class SBCtrl {
     Set<String> yum = null; // yummy ep list
     Set<String> avep = null;
     
-    String clfile = "cl.txt";
-    String clrelfile = "clrel.txt";
+    String clfile = "cc/cl.txt";
+    String clrelfile = "cc/clrel.txt";
     
     public SBCtrl(){ // default contructer
         // cl.txt -> cl

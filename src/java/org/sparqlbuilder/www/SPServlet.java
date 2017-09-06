@@ -11,10 +11,7 @@ import org.sparqlbuilder.core.ClassLink;
 import org.sparqlbuilder.core.Direction;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -95,15 +92,13 @@ public class SPServlet extends HttpServlet {
         }
         String query = null;
         try {
-           query = convertPath2SPARQL(path);
+           query = convertPath2SPARQL(path, 100);
         } catch (Exception ex) {
             Logger.getLogger(SPServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
         out.print(query);
     }
-
     
-
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -130,31 +125,30 @@ public class SPServlet extends HttpServlet {
 
     private Path convertJ2Path(String jpath) throws JSONException{
   
-       JSONObject object = new JSONObject(jpath);
+        JSONObject object = new JSONObject(jpath);
    
     //   int width = Integer.parseInt(object.getJSONObject("width").toString());
-       JSONArray classLinks = object.getJSONArray("classLinks");
+        JSONArray classLinks = object.getJSONArray("classLinks");
         JSONObject jsonObject;
         List <ClassLink> list = new ArrayList<ClassLink>();
        
-       for (int i=0;i<classLinks.length();i++) 
-       {
+        for (int i=0;i<classLinks.length();i++){
             jsonObject = classLinks.getJSONObject(i);  
                
-             String direction=jsonObject.getString("direction"); 
-             Direction myDirection = null;
-             if (direction.equals(Direction.forward.toString()))
-                     myDirection=Direction.forward;
-             else if (direction.equals(Direction.reverse.toString()))
-                 myDirection=Direction.reverse;
-                 else if (direction.equals(Direction.both.toString()))                  
-                  myDirection=Direction.both;
+            String direction=jsonObject.getString("direction"); 
+            Direction myDirection = null;
+            if (direction.equals(Direction.forward.toString())){
+                myDirection=Direction.forward;
+            }else if (direction.equals(Direction.reverse.toString())){
+                myDirection=Direction.reverse;
+            }else if (direction.equals(Direction.both.toString()))                  
+                myDirection=Direction.both;
            
                  
-               String linkedLiteralDatatypeURI=null;
+            String linkedLiteralDatatypeURI=null;
             //   linkedLiteralDatatypeURI = jsonObject.getString("linkedLiteralDatatypeURI");
-               String linkedClassURI = jsonObject.getString("linkedClass"); 
-               String propertyURI = jsonObject.getString("predicate");
+            String linkedClassURI = jsonObject.getString("linkedClass"); 
+            String propertyURI = jsonObject.getString("predicate");
               
         //    int numOfLinks = Integer.parseInt(jsonObject.getJSONObject("numOfLinks").toString());
         //    int numOfLinkedInstances = Integer.parseInt(jsonObject.getJSONObject("numOfLinkedInstances").toString()); 
@@ -166,118 +160,115 @@ public class SPServlet extends HttpServlet {
 	//			 numOfLinks,  numOfOriginInstances,  numOfLinkedInstances,
 	//			 numOfOriginClassInstances,  numOfLinkedClassInstances,
 	//			false, false);
-        ClassLink classLink =new ClassLink(propertyURI, linkedClassURI, linkedLiteralDatatypeURI, myDirection, 
+            ClassLink classLink =new ClassLink(propertyURI, linkedClassURI, linkedLiteralDatatypeURI, myDirection, 
 				 0,  0,  0,
 				 0,  0,
 				false, false);
             System.out.println(classLink.getDirection().toString());  
-           list.add(classLink);
-    }
-           String startClass = object.getString("startClass");
-          Path path = new Path(startClass,  list,  0);
+            list.add(classLink);
+        }
+        String startClass = object.getString("startClass");
+        Path path = new Path(startClass,  list,  0);
          
-          return path;
+        return path;
     }
     
-    private String convertPath2SPARQL(Path path) throws Exception{
+    private String convertPath2SPARQL(Path path, int limit) throws Exception{
         ArrayList<String> classname =new ArrayList<String>() ;
         if( path == null ){
-			throw new Exception("Path is null.");
-		}
-		String startClass = path.getStartClass();
-		List<ClassLink> classLinks = path.getClassLinks();
+	    throw new Exception("Path is null.");
+        }
+	String startClass = path.getStartClass();
+	List<ClassLink> classLinks = path.getClassLinks();
         
-		StringBuffer queryStr = new StringBuffer();
-		StringBuffer selStr = new StringBuffer();
-		StringBuffer whereStr = new StringBuffer();
+	StringBuffer queryStr = new StringBuffer();
+	StringBuffer selStr = new StringBuffer();
+	StringBuffer whereStr = new StringBuffer();
 	//	if(num==0){
-			int num = classLinks.size();
+	int num = classLinks.size();
 	//	}
 			
-		queryStr.append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n");
-		queryStr.append("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
+	queryStr.append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n");
+	queryStr.append("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
 				
-		selStr.append("SELECT ");
-		whereStr.append("WHERE { \n");
+	selStr.append("SELECT ");
+	whereStr.append("WHERE { \n");
 
-		String properties = null;
-		String objectClasses = null;
-		String subjectClasses = null;
-		Direction direction = null;
-		int i = 0;
-		int k = 0;
-		for (ClassLink link :classLinks )
-		{
-			properties = link.getPropertyURI();
-			objectClasses = link.getLinkedClassURI();
-			direction = link.getDirection();
+	String properties = null;
+	String objectClasses = null;
+	String subjectClasses = null;
+	Direction direction = null;
+	int i = 0;
+	int k = 0;
+	for (ClassLink link :classLinks ){
+	    properties = link.getPropertyURI();
+	    objectClasses = link.getLinkedClassURI();
+	    direction = link.getDirection();
 			
-			if (i==0)
-		             subjectClasses = startClass;
-                       
-			classname.add(subjectClasses);
-			selStr.append("?c").append(i).append(" ");
-			selStr.append("?l").append(i).append(" ");
+	    if (i==0){
+		subjectClasses = startClass;
+            }           
+	    classname.add(subjectClasses);
+	    selStr.append("?c").append(i).append(" ");
+	    selStr.append("?l").append(i).append(" ");
 			
-			if(i == classLinks.size())
-				selStr.append("\n");
-			
-			
-			whereStr.append("?c").append(i).
-			append(" rdf:type ").
-			append("<").
-			append(subjectClasses).
-			append(">").
-			append(".\n");
-			
-			whereStr.append("OPTIONAL{\n?c"+i+" rdfs:label ?l"+i+".}\n");
+	    if(i == classLinks.size()){
+		selStr.append("\n");
+            }
+
+            //if ( ){
+	        whereStr.append("?c").append(i).
+	        append(" rdf:type ").
+	        append("<").
+	        append(subjectClasses).
+	        append(">").
+	        append(".\n");
+            //}	
+	    whereStr.append("OPTIONAL{\n?c"+i+" rdfs:label ?l"+i+".}\n");
 
 						
-			if(direction == Direction.forward)
-			{
-			whereStr.append("?c").append(i).append(" ");
-			whereStr.append("<").append(properties).append("> ");			
-			whereStr.append("?c").append(i+1).append(".\n");			
-			}
-			else
-			{
-				whereStr.append("?c").append(i+1).append(" ");
-				whereStr.append("<").append(properties).append("> ");
-				whereStr.append("?c").append(i).append(".\n");
-			}
+	    if(direction == Direction.forward){
+		whereStr.append("?c").append(i).append(" ");
+		whereStr.append("<").append(properties).append("> ");			
+		whereStr.append("?c").append(i+1).append(".\n");			
+	    }else{
+		whereStr.append("?c").append(i+1).append(" ");
+		whereStr.append("<").append(properties).append("> ");
+		whereStr.append("?c").append(i).append(".\n");
+	    }
 			
-			subjectClasses = objectClasses;
-			i++;
-			k++;
-			if(k>=num){
-				break;
-			}
-		}
+	    subjectClasses = objectClasses;
+	    i++;
+	    k++;
+	    if(k>=num){
+		break;
+	    }
+	}
 		
-		selStr.append("?c").append(i).append(" \n");
-		selStr.append("?l").append(i).append(" \n");
-		whereStr.append("?c").append(i).append(" rdf:type ").
-		    append("<").
-		    append(subjectClasses).
-		    append(">").
-			append(".\n");
-		whereStr.append("OPTIONAL{\n?c"+i+" rdfs:label ?l"+i+".}\n");
-                classname.add(subjectClasses);
+	selStr.append("?c").append(i).append(" \n");
+	selStr.append("?l").append(i).append(" \n");
+	whereStr.append("?c").append(i).append(" rdf:type ").
+        append("<").
+        append(subjectClasses).
+	append(">").
+	append(".\n");
+	whereStr.append("OPTIONAL{\n?c"+i+" rdfs:label ?l"+i+".}\n");
+        classname.add(subjectClasses);
 	
 					
-		queryStr.append(selStr).append(whereStr);
+	queryStr.append(selStr).append(whereStr);
 		
-		queryStr.append("}");
-		//OPTIONAL
-		queryStr.append("LIMIT 100\n");
-                
-               System.out.println(queryStr); 
+	queryStr.append("}");
+	//OPTIONAL
+	queryStr.append("LIMIT ").append(Integer.toString(limit)).append("\n");
+                        
+        System.out.println(queryStr); 
                
-              //rewrite Sparql                
+        //rewrite Sparql                
 	                 
-               ArrayList<String> classname2 = new ArrayList<String>();
-               for(int index=0;index<classname.size();index++){
-                  String  tmp=classname.get(index);
+        ArrayList<String> classname2 = new ArrayList<String>();
+        for(int index=0;index<classname.size();index++){
+            String  tmp=classname.get(index);
                   /*
                   int mark;
                   if((mark=tmp.indexOf("#"))!=-1)
@@ -285,24 +276,24 @@ public class SPServlet extends HttpServlet {
                   else classname2.add(tmp.substring(tmp.indexOf("/")+1));
                   */
                   // changed by Atsuko
-                  String[] sname1 = tmp.split("#");
-                  String[] sname2 = sname1[sname1.length -1].split("/");
-                  String[] sname3 = sname2[sname2.length -1].split(":");
-                  String cname = sname3[sname3.length -1].replaceAll("-", "");
-                  classname2.add(cname);
-               }
-               String query=queryStr.toString();
-                for(int index=0;index<classname2.size();index++){
-                  String  original="c"+index;
-                  query= query.replaceAll(original, classname2.get(index));
-                }
-                query= query.replaceAll("\\?l","\\?label");
-		System.out.println(query);
-		return query;
+            String[] sname1 = tmp.split("#");
+            String[] sname2 = sname1[sname1.length -1].split("/");
+            String[] sname3 = sname2[sname2.length -1].split(":");
+            String cname = sname3[sname3.length -1].replaceAll("-", "");
+            classname2.add(cname);
+        }
+        String query=queryStr.toString();
+        for(int index=0;index<classname2.size();index++){
+            String  original="c"+index;
+            query= query.replaceAll(original, classname2.get(index));
+        }
+            query= query.replaceAll("\\?l","\\?label");
+            System.out.println(query);
+	return query;
     }
     
     private static String rewriteSparql(String query){
-        StringBuffer tmp=new StringBuffer(query);
+        StringBuffer tmp = new StringBuffer(query);
        int index= tmp.indexOf("WHERE");
        int begin=0,cnt=0;
        while(begin<index)
@@ -313,14 +304,16 @@ public class SPServlet extends HttpServlet {
        }
         return null;
     }
-        private static List<String> convertJ2Path2(String jpath) throws JSONException{
+    
+/*
+    private static List<String> convertJ2Path2(String jpath) throws JSONException{
          List <String> list = null;
            String temp =(String) jpath.subSequence(2, jpath.length()-2);
       //  if (temp.contains(","")) 
              list =Arrays.asList(temp.split("\",\""));
              return list;
   
-     /*  JSONArray classLinks=new JSONArray(jpath); 
+       JSONArray classLinks=new JSONArray(jpath); 
        String string;
        
        for (int i=0;i<classLinks.length();i++) 
@@ -332,11 +325,13 @@ public class SPServlet extends HttpServlet {
        } else 
           throw new IllegalArgumentException("path error");
                
-         }*/
+         }
        
        //   return list;    
     }
+*/
     
+    /* 
     private static String convertPath2SPARQL2(List<String> path) throws Exception{
         if( path == null ){
 			throw new Exception("Path is null.");
@@ -444,5 +439,5 @@ public class SPServlet extends HttpServlet {
         
     
     }
-    
+    */
 }
